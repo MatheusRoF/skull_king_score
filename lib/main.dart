@@ -1,19 +1,23 @@
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/player_provider.dart';
 import 'screens/player_screen.dart';
 
 void main() {
-  runApp(SkullKingApp());
+  runApp(const SkullKingApp());
 }
 
 class SkullKingApp extends StatelessWidget {
+  const SkullKingApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Skull King Score',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: PlayerScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => PlayerProvider(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: PlayerScreen(),
+      ),
     );
   }
 }

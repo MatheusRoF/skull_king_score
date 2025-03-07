@@ -1,61 +1,54 @@
 import 'package:flutter/material.dart';
-import 'bet_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/player_provider.dart';
+import 'round_screen.dart';
 
 class PlayerScreen extends StatefulWidget {
+  const PlayerScreen({super.key});
+
   @override
-  _PlayerScreenState createState() => _PlayerScreenState();
+  PlayerScreenState createState() => PlayerScreenState();
 }
 
-class _PlayerScreenState extends State<PlayerScreen> {
-  final List<String> players = [];
+class PlayerScreenState extends State<PlayerScreen> {  // Alterar de _PlayerScreenState para PlayerScreenState
   final TextEditingController _controller = TextEditingController();
-
-  void _addPlayer() {
-    if (_controller.text.isNotEmpty && players.length < 8) {
-      setState(() {
-        players.add(_controller.text);
-        _controller.clear();
-      });
-    }
-  }
-
-  void _startGame() {
-    if (players.length >= 2) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BetScreen(players: players, onBetsConfirmed: (bets) {}),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    var playerProvider = Provider.of<PlayerProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(title: Text("Adicionar Jogadores")),
+      appBar: AppBar(title: const Text("Adicionar Jogadores")),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(labelText: "Nome do jogador"),
-            ),
+          TextField(controller: _controller, decoration: const InputDecoration(labelText: "Nome do Jogador")),
+          ElevatedButton(
+            onPressed: () {
+              if (_controller.text.isNotEmpty) {
+                playerProvider.addPlayer(_controller.text);
+                _controller.clear();
+              }
+            },
+            child: const Text("Adicionar"),
           ),
-          ElevatedButton(onPressed: _addPlayer, child: Text("Adicionar")),
           Expanded(
             child: ListView.builder(
-              itemCount: players.length,
-              itemBuilder: (context, index) => ListTile(title: Text(players[index])),
+              itemCount: playerProvider.players.length,
+              itemBuilder: (context, index) => ListTile(
+                title: Text(playerProvider.players[index].name),
+              ),
             ),
           ),
-          ElevatedButton(
-            onPressed: _startGame,
-            child: Text("Iniciar Jogo"),
-          ),
+          if (playerProvider.players.isNotEmpty)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const RoundScreen()));
+              },
+              child: const Text("Iniciar Jogo"),
+            ),
         ],
       ),
     );
   }
 }
+
